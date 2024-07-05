@@ -1,4 +1,6 @@
-const { createUserDb } = require('../domains/user')
+const { createUserDb, getUserByNameDb } = require('../domains/user')
+const jwt = require('jsonwebtoken');
+const secret = process.env.JWT_SECRET
 
 const createUser = async (req, res) => {
     const {
@@ -14,6 +16,41 @@ const createUser = async (req, res) => {
     res.status(201).json({ user: createdUser })
 }
 
+const loginUser = async (req, res) => {
+    const { username, password } = req.body
+
+    const foundUser = await getUserByNameDb(username)
+
+    if (username === foundUser.username && password === foundUser.password) {
+        const token = jwt.sign(username, secret)
+
+        res.json({
+            token
+        })
+    } else {
+        res.json({
+            message: "Username or password incorrect"
+        })
+    }
+}
+
+const getProfile = async (req, res) => {
+    const token = req.headers.authorization
+
+    try {
+        jwt.verify(token, secret)
+        res.json({
+            profile: 'some profile'
+        })
+      } catch(err) {
+        res.status(401).json({
+            message: 'Failure to get profile, not authorised'
+        })
+      }
+}
+
 module.exports = {
     createUser,
+    loginUser,
+    getProfile
 }

@@ -1,5 +1,5 @@
+const { profile } = require('../utils/prisma')
 const prisma = require('../utils/prisma')
-
 
 const createUserDb = async (username, password, name, bio) => await prisma.user.create({
     data: {
@@ -16,6 +16,18 @@ const createUserDb = async (username, password, name, bio) => await prisma.user.
     }
 })
 
+async function getUserByNameDb (username) {
+    return await prisma.user.findUniqueOrThrow({
+        where: {
+            username: username
+        },
+        include: {
+            profile: true
+        }
+    })
+}
+
 module.exports = {
-    createUserDb
+    createUserDb,
+    getUserByNameDb
 }

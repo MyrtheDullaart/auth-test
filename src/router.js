@@ -1,10 +1,10 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const { createUser } = require('./controllers/user');
-const secret = process.env.JWT_SECRET
+const { createUser, loginUser, getProfile } = require('./controllers/user');
 
 const router = express.Router();
 
 router.post('/register', createUser)
+router.post('/login', loginUser)
+router.get('/profile', getProfile)
 
 module.exports = router;
