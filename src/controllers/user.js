@@ -22,7 +22,7 @@ const loginUser = async (req, res) => {
     const foundUser = await getUserByNameDb(username)
 
     if (username === foundUser.username && password === foundUser.password) {
-        const token = jwt.sign(username, secret)
+        const token = jwt.sign({username: username}, secret)
 
         res.json({
             token
@@ -38,9 +38,14 @@ const getProfile = async (req, res) => {
     const token = req.headers.authorization
 
     try {
-        jwt.verify(token, secret)
+        const payload = jwt.verify(token, secret)
+
+        const username = payload.username
+
+        const foundUser = await getUserByNameDb(username)
+
         res.json({
-            profile: 'some profile'
+            profile: foundUser.profile
         })
       } catch(err) {
         res.status(401).json({
